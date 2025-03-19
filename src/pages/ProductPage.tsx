@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import GalleryWithBullets from "../components/ui/Gallery";
 import ProductDetails from "../components/ui/ProductDetails";
-import { useProduct } from "../hooks/usePrintful";
+import { useProduct } from "../hooks/useProducts";
 
 export default function ProductPage() {
   const { id } = useParams();
@@ -18,26 +18,30 @@ export default function ProductPage() {
     return null;
   }
 
-  if (isProductLoading) return <p>Loading...</p>;
-
   const images = [
     {
       imageSrc:
-        product &&
-        ("sync_product" in product
-          ? product.sync_product?.thumbnail_url ?? ""
-          : product.thumbnail_url ?? "") || "",
+        (product &&
+          ("sync_product" in product
+            ? product.sync_product?.thumbnail_url ?? ""
+            : product.thumbnail_url ?? "")) ||
+        "",
       alt:
-        product &&
-        ("sync_product" in product ? product.sync_product?.name ?? "" : product.name ?? "") || "",
+        (product &&
+          ("sync_product" in product
+            ? product.sync_product?.name ?? ""
+            : product.name ?? "")) ||
+        "",
     },
   ];
 
   return (
     <section className="flex flex-col gap-12 p-12">
       <section className="flex flex-col md:flex-row md:gap-12">
-        {images && <GalleryWithBullets images={images} />}
-        {product && <ProductDetails product={product} />}
+        {images && (
+          <GalleryWithBullets images={images} loading={isProductLoading} />
+        )}
+        <ProductDetails product={product} loading={isProductLoading} />
       </section>
       {/* {relatedProducts.length > 0 && (
         <section className="flex flex-col gap-12">

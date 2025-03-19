@@ -84,3 +84,23 @@ export const buildCategoryTree = (
       subcategories: buildCategoryTree(categories, category.id),
     }));
 };
+
+export const handleWishlistToggle = (
+  product: Product | undefined,
+  isInWishlist: boolean,
+  addToWishlist: (product: Product) => void,
+  removeFromWishlist: (id: string) => void,
+  setIsInWishlist: (value: boolean) => void
+) => {
+  if (!product) return;
+
+  const idToString = getProductId(product).toString();
+
+  if (isInWishlist) {
+    removeFromWishlist(idToString);
+  } else {
+    addToWishlist(product);
+  }
+
+  setIsInWishlist(!isInWishlist);
+};

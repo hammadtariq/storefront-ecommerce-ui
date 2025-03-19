@@ -6,13 +6,30 @@ import {
   SfLink,
   SfIconShoppingCart,
   SfIconFavorite,
+  SfIconFavoriteFilled,
 } from "@storefront-ui/react";
 import { Product } from "../../types/Product";
-import { generateShortDescription } from "../../utils/common";
-import PLACEHOLDER_IMAGE from "../../assets/no-image.jpg"
-
+import {
+  generateShortDescription,
+  getProductId,
+  handleWishlistToggle,
+} from "../../utils/common";
+import PLACEHOLDER_IMAGE from "../../assets/no-image.jpg";
+import { useWishlist } from "../../hooks/useWishlist";
+import { useEffect, useState } from "react";
 
 export default function ProductCardVertical({ product }: { product: Product }) {
+  const { addToWishlist, removeFromWishlist, wishlist } = useWishlist();
+  const [isInWishlist, setIsInWishlist] = useState(false);
+
+  useEffect(() => {
+      if (product) {
+        setIsInWishlist(
+          wishlist.some((item) => getProductId(item) === getProductId(product))
+        );
+      }
+    }, [wishlist, product]);
+
   const productImage =
     "sync_product" in product
       ? product.sync_product.thumbnail_url
@@ -40,14 +57,31 @@ export default function ProductCardVertical({ product }: { product: Product }) {
           />
         </Link>
         <SfButton
-          variant="tertiary"
           size="sm"
-          square
-          className="absolute bottom-0 right-0 mr-2 mb-2 bg-white ring-1 ring-inset ring-neutral-200 !rounded-full"
-          aria-label="Add to wishlist"
-        >
-          <SfIconFavorite size="sm" />
-        </SfButton>
+          variant="tertiary"
+          slotPrefix={
+            product && isInWishlist ? (
+              <SfIconFavoriteFilled
+                size="sm"
+                className="text-green-500 transition-colors"
+              />
+            ) : (
+              <SfIconFavorite
+                size="sm"
+                className="text-gray-500 transition-colors"
+              />
+            )
+          }
+          onClick={() =>
+            handleWishlistToggle(
+              product,
+              isInWishlist,
+              addToWishlist,
+              removeFromWishlist,
+              setIsInWishlist
+            )
+          }
+        ></SfButton>
       </div>
 
       {/* Content Wrapper */}

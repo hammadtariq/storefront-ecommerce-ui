@@ -1,7 +1,8 @@
 import { useParams } from "react-router-dom";
 import CategorySidebar from "../components/ui/CategorySidebar";
 import ProductCardVertical from "../components/ui/ProductCard";
-import { useCategories, useProducts } from "../hooks/usePrintful";
+import { useProducts } from "../hooks/useProducts";
+import { useCategories } from "../hooks/useCategories";
 
 export default function CategoryPage() {
   const { id } = useParams();

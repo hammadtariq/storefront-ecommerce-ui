@@ -8,11 +8,14 @@ import {
 import classNames from "classnames";
 import { GalleryWithBulletsProps } from "../../types/Props.types";
 
-export default function GalleryWithBullets({ images }: GalleryWithBulletsProps) {
+export default function GalleryWithBullets({
+  images,
+  loading,
+}: GalleryWithBulletsProps) {
   const [activeIndex, setActiveIndex] = useState(0);
 
   return (
-    <div className="relative max-h-[600px] flex flex-col w-full aspect-[4/3] gap-1">
+    <div className="relative max-h-[450px] max-w-[900px] flex flex-col w-full aspect-[5/4] gap-1">
       <SfScrollable
         className="w-full h-full snap-x snap-mandatory overflow-hidden"
         wrapperClassName="group/scrollable h-full"
@@ -42,23 +45,29 @@ export default function GalleryWithBullets({ images }: GalleryWithBulletsProps) 
           />
         }
       >
-        {images.map(({ imageSrc, alt }, index) => (
-          <div
-            className="relative flex justify-center basis-full snap-center shrink-0 grow"
-            key={`${alt}-${index}`}
-          >
-            <img
-              aria-label={alt}
-              aria-hidden={activeIndex !== index}
-              className="object-contain w-auto h-full"
-              alt={alt}
-              src={imageSrc}
-              width={600}
-              height={450}
-              draggable="false"
-            />
+        {loading ? (
+          <div className="animate-pulse flex justify-center items-center basis-full snap-center shrink-0 grow bg-gray-200 h-[450px] w-full rounded-lg">
+            <div className="w-3/4 h-3/4 bg-gray-300 rounded"></div>
           </div>
-        ))}
+        ) : (
+          images.map(({ imageSrc, alt }, index) => (
+            <div
+              className="relative flex justify-center basis-full snap-center shrink-0 grow"
+              key={`${alt}-${index}`}
+            >
+              <img
+                aria-label={alt}
+                aria-hidden={activeIndex !== index}
+                className="object-contain w-auto h-full"
+                alt={alt}
+                src={imageSrc}
+                width={600}
+                height={450}
+                draggable="true"
+              />
+            </div>
+          ))
+        )}
       </SfScrollable>
       <div className="flex-shrink-0 basis-auto">
         <div className="flex w-full gap-0.5 mt-1">

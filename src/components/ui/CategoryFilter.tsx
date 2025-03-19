@@ -7,12 +7,15 @@ import {
 } from "@storefront-ui/react";
 import classNames from "classnames";
 import { useNavigate } from "react-router-dom";
-import { useCategory } from "../../hooks/usePrintful";
 import { CategoryFilterProps } from "../../types/Props.types";
 import CategoryList from "./CategoryList";
 import { buildCategoryTree } from "../../utils/common";
+import { useCategory } from "../../hooks/useCategories";
 
-export default function CategoryFilter({ categories, id }: CategoryFilterProps) {
+export default function CategoryFilter({
+  categories,
+  id,
+}: CategoryFilterProps) {
   const [opened, setOpened] = useState(true);
   const navigate = useNavigate();
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | undefined>(id ? Number(id) : undefined);
@@ -33,7 +36,10 @@ export default function CategoryFilter({ categories, id }: CategoryFilterProps) 
     navigate(categoryId ? `/category/${categoryId}` : "/category");
   };
 
-  const nestedCategories = useMemo(() => buildCategoryTree(mergedCategories), [mergedCategories]);
+  const nestedCategories = useMemo(
+    () => buildCategoryTree(mergedCategories),
+    [mergedCategories]
+  );
 
   return (
     <SfAccordionItem
@@ -44,14 +50,19 @@ export default function CategoryFilter({ categories, id }: CategoryFilterProps) 
         <div className="flex justify-between p-2 mb-2 bg-neutral-100 md:rounded-md px-4 py-2 text-sm font-bold uppercase">
           <p className="font-medium">Category</p>
           <SfIconChevronLeft
-            className={classNames("text-neutral-500", { "rotate-90": opened, "-rotate-90": !opened })}
+            className={classNames("text-neutral-500", {
+              "rotate-90": opened,
+              "-rotate-90": !opened,
+            })}
           />
         </div>
       }
     >
       <ul className="mt-2 mb-6">
         {id && isError && (
-          <li className="text-center py-2 text-red-500">Failed to load category. Please try again.</li>
+          <li className="text-center py-2 text-red-500">
+            Failed to load category. Please try again.
+          </li>
         )}
 
         {/* All Categories Option */}
@@ -62,7 +73,9 @@ export default function CategoryFilter({ categories, id }: CategoryFilterProps) 
                 size="sm"
                 as="button"
                 onClick={() => handleCategorySelect(undefined)}
-                className={classNames("rounded-md py-2 mb-2 bg-gray-100 hover:bg-gray-200")}
+                className={classNames(
+                  "rounded-md py-2 mb-2 bg-gray-100 hover:bg-gray-200"
+                )}
                 slotSuffix={!id && <SfIconCheck size="sm" />}
               >
                 <span className="flex items-center text-base">All</span>

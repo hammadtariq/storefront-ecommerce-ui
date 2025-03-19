@@ -16,8 +16,10 @@ export type GalleryWithBulletsProps = {
     imageSrc: string;
     alt: string;
   }[];
+  loading: boolean | "" | null;
 };
 
 export type ProductDetailsProps = {
-  product: Product;
+  product: Product | undefined;
+  loading: boolean | "" | null;
 };
