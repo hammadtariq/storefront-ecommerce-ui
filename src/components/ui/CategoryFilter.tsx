@@ -9,13 +9,13 @@ import classNames from "classnames";
 import { useNavigate } from "react-router-dom";
 import { useCategory } from "../../hooks/usePrintful";
 import { CategoryFilterProps } from "../../types/Props.types";
+import CategoryList from "./CategoryList";
+import { buildCategoryTree } from "../../utils/common";
 
-export default function CategoryFilter({
-  categories,
-  id,
-}: CategoryFilterProps) {
+export default function CategoryFilter({ categories, id }: CategoryFilterProps) {
   const [opened, setOpened] = useState(true);
   const navigate = useNavigate();
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | undefined>(id ? Number(id) : undefined);
 
   // ✅ Only fetch category if an ID is selected
   const { category, isError } = useCategory(id ?? null);
@@ -28,10 +28,12 @@ export default function CategoryFilter({
     return categories;
   }, [categories, category, id]);
 
-  // Handle category selection
   const handleCategorySelect = (categoryId?: number) => {
+    setSelectedCategoryId(categoryId);
     navigate(categoryId ? `/category/${categoryId}` : "/category");
   };
+
+  const nestedCategories = useMemo(() => buildCategoryTree(mergedCategories), [mergedCategories]);
 
   return (
     <SfAccordionItem
@@ -42,20 +44,14 @@ export default function CategoryFilter({
         <div className="flex justify-between p-2 mb-2 bg-neutral-100 md:rounded-md px-4 py-2 text-sm font-bold uppercase">
           <p className="font-medium">Category</p>
           <SfIconChevronLeft
-            className={classNames("text-neutral-500", {
-              "rotate-90": opened,
-              "-rotate-90": !opened,
-            })}
+            className={classNames("text-neutral-500", { "rotate-90": opened, "-rotate-90": !opened })}
           />
         </div>
       }
     >
       <ul className="mt-2 mb-6">
-        {/* Show error state only when fetching a category by ID */}
         {id && isError && (
-          <li className="text-center py-2 text-red-500">
-            Failed to load category. Please try again.
-          </li>
+          <li className="text-center py-2 text-red-500">Failed to load category. Please try again.</li>
         )}
 
         {/* All Categories Option */}
@@ -65,38 +61,20 @@ export default function CategoryFilter({
               <SfListItem
                 size="sm"
                 as="button"
-                onClick={() => handleCategorySelect()}
-                className={classNames("rounded-md active:bg-primary-100", {
-                  "bg-primary-100 font-medium": !id,
-                })}
-                slotSuffix={
-                  !id && <SfIconCheck size="sm" className="text-primary-700" />
-                }
+                onClick={() => handleCategorySelect(undefined)}
+                className={classNames("rounded-md py-2 mb-2 bg-gray-100 hover:bg-gray-200")}
+                slotSuffix={!id && <SfIconCheck size="sm" />}
               >
-                <span className="flex items-center">All</span>
+                <span className="flex items-center text-base">All</span>
               </SfListItem>
             </li>
 
-            {/* Render Merged Categories */}
-            {mergedCategories.map((category) => (
-              <li key={category.id}>
-                <SfListItem
-                  size="sm"
-                  as="button"
-                  onClick={() => handleCategorySelect(category.id)}
-                  className={classNames("rounded-md active:bg-primary-100", {
-                    "bg-primary-100 font-medium": id === category.id.toString(),
-                  })}
-                  slotSuffix={
-                    id === category.id.toString() && (
-                      <SfIconCheck size="sm" className="text-primary-700" />
-                    )
-                  }
-                >
-                  <span className="flex items-center">{category.title}</span>
-                </SfListItem>
-              </li>
-            ))}
+            {/* Render Category List */}
+            <CategoryList
+              categories={nestedCategories}
+              handleCategorySelect={handleCategorySelect}
+              selectedCategoryId={selectedCategoryId} // ✅ Pass selected category ID
+            />
           </>
         )}
       </ul>
