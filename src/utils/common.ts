@@ -18,6 +18,7 @@
 //     }
 //   };
 
+import { Category } from "../types/Category";
 import { Product } from "../types/Product";
 
 //   /**
@@ -71,3 +72,15 @@ export const formatTitle = (title: string) => {
 // Helper function to get a product's unique identifier
 export const getProductId = (product: Product) =>
   "sync_product" in product ? product.sync_product.id : product.id;
+
+export const buildCategoryTree = (
+  categories: Category[],
+  parentId: number = 0
+): Category[] => {
+  return categories
+    .filter((category) => category.parent_id === parentId)
+    .map((category) => ({
+      ...category,
+      subcategories: buildCategoryTree(categories, category.id),
+    }));
+};

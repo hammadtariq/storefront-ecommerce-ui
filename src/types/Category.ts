@@ -4,4 +4,5 @@ export interface Category {
   image_url: string;
   size: string;
   title: string;
+  subcategories?: Category[];
 }
