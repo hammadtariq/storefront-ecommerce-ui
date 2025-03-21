@@ -5,21 +5,18 @@ import {
   SfIconCompareArrows,
   SfIconFavorite,
   SfIconPackage,
-  SfIconRemove,
-  SfIconAdd,
   SfIconWarehouse,
   SfIconSafetyCheck,
   SfIconShoppingCartCheckout,
   SfIconFavoriteFilled,
 } from "@storefront-ui/react";
 import { useCounter } from "react-use";
-import type { ChangeEvent } from "react";
-import { useEffect, useId, useState } from "react";
-import { clamp } from "@storefront-ui/shared";
+import { useEffect, useState } from "react";
 import { useCart } from "../../hooks/useCart";
 import { useWishlist } from "../../hooks/useWishlist";
 import { ProductDetailsProps } from "../../types/Props.types";
-import { getProductId, handleWishlistToggle } from "../../utils/common";
+import { handleAddToCart, handleWishlistToggle } from "../../utils/common";
+import Counter from "./Counter";
 
 export default function ProductDetails({
   product,
@@ -32,44 +29,24 @@ export default function ProductDetails({
   useEffect(() => {
     if (product) {
       setIsInWishlist(
-        wishlist.some((item) => getProductId(item) === getProductId(product))
+        wishlist.some(
+          (item) => item.sync_product.id === product.sync_product.id
+        )
       );
     }
   }, [wishlist, product]);
 
-  const inputId = useId();
-  const min = 1;
-  const max = 999;
-  const [value, { inc, dec, set }] = useCounter(min);
+  const [value, { set }] = useCounter(1);
 
-  const handleOnChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const nextValue = parseFloat(event.target.value);
-    set(Number(clamp(nextValue, min, max)));
-  };
+  const productName = product?.sync_product?.name ?? "Unknown Product";
 
-  const productName =
-    product &&
-    ("sync_product" in product
-      ? product.sync_product?.name ?? "Unknown Product"
-      : product.name);
+  const productPrice = product?.sync_variants?.length
+    ? product.sync_variants[0]?.retail_price
+    : 0;
 
-  const productPrice =
-    product &&
-    ("sync_variants" in product && product.sync_variants?.length
-      ? product.sync_variants[0]?.retail_price ?? 0
-      : 0);
-
-  const availabilityStatus =
-    product &&
-    ("sync_variants" in product && product.sync_variants?.length
-      ? product.sync_variants[0]?.availability_status ?? "Unavailable"
-      : "Unavailable");
-
-  const handleAddToCart = () => {
-    if (product) {
-      addToCart({ product, quantity: value });
-    }
-  };
+  const availabilityStatus = product?.sync_variants?.length
+    ? product.sync_variants[0]?.availability_status
+    : "Unavailable";
 
   return (
     <section className="md:max-w-[640px]">
@@ -137,56 +114,23 @@ export default function ProductDetails({
                 cart
                   .filter(
                     (item) =>
-                      getProductId(item.product) === getProductId(product)
+                      item.product.sync_product.id === product.sync_product.id
                   )
                   .reduce((sum, item) => sum + item.quantity, 0)}
             </div>
 
             <div className="items-start xs:flex">
               <div className="flex flex-col items-stretch xs:items-center xs:inline-flex">
-                <div className="flex border border-neutral-300 rounded-md">
-                  <SfButton
-                    variant="tertiary"
-                    square
-                    className="rounded-r-none p-3"
-                    disabled={value <= min}
-                    aria-controls={inputId}
-                    aria-label="Decrease value"
-                    onClick={() => dec()}
-                  >
-                    <SfIconRemove />
-                  </SfButton>
-                  <input
-                    id={inputId}
-                    type="number"
-                    role="spinbutton"
-                    className="grow mx-2 w-8 text-center bg-transparent font-medium appearance-none focus-visible:outline focus-visible:outline-offset focus-visible:rounded-sm"
-                    min={min}
-                    max={max}
-                    value={value}
-                    onChange={handleOnChange}
-                  />
-                  <SfButton
-                    variant="tertiary"
-                    square
-                    className="rounded-l-none p-3"
-                    disabled={value >= max}
-                    aria-controls={inputId}
-                    aria-label="Increase value"
-                    onClick={() => inc()}
-                  >
-                    <SfIconAdd />
-                  </SfButton>
-                </div>
-                <p className="self-center mt-1 mb-4 text-xs text-neutral-500 xs:mb-0">
+                <Counter value={value} onValueChange={set} min={1} max={999} />
+                {/* <p className="self-center mt-1 mb-4 text-xs text-neutral-500 xs:mb-0">
                   <strong className="text-neutral-900">{max}</strong> in stock
-                </p>
+                </p> */}
               </div>
               <SfButton
                 size="lg"
                 className="w-full xs:ml-4"
                 slotPrefix={<SfIconShoppingCart size="sm" />}
-                onClick={handleAddToCart}
+                onClick={() => handleAddToCart(product, value, addToCart)}
               >
                 <span className="md:hidden lg:block">Add to cart</span>
               </SfButton>

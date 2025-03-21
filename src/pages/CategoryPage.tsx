@@ -1,13 +1,13 @@
 import { useParams } from "react-router-dom";
 import CategorySidebar from "../components/ui/CategorySidebar";
 import ProductCardVertical from "../components/ui/ProductCard";
-import { useProducts } from "../hooks/useProducts";
+import { useProductDetails } from "../hooks/useProducts";
 import { useCategories } from "../hooks/useCategories";
 
 export default function CategoryPage() {
   const { id } = useParams();
   const { categories, isLoading: loadingCategories } = useCategories();
-  const { products, isLoading: loadingProducts } = useProducts(
+  const { products, isLoading: loadingProducts } = useProductDetails(
     id ? { categoryId: id } : undefined
   );
 
@@ -41,9 +41,7 @@ export default function CategoryPage() {
         ) : (
           products.map((product) => (
             <ProductCardVertical
-              key={
-                "sync_product" in product ? product.sync_product.id : product.id
-              }
+              key={product.sync_product.id}
               product={product}
             />
           ))
@@ -52,4 +50,3 @@ export default function CategoryPage() {
     </div>
   );
 }
-

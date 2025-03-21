@@ -7,7 +7,8 @@ export interface CartItem {
 
 export interface CartContextType {
   cart: CartItem[];
-  addToCart: (item: CartItem) => void;
-  removeFromCart: (productId: string) => void;
   clearCart: () => void;
+  addToCart: (item: CartItem) => void;
+  removeFromCart: (productId: number) => void;
+  updateCartItem: (productId: number, quantity: number) => void;
 }

@@ -2,30 +2,32 @@ import { useState } from "react";
 import {
   SfButton,
   SfIconShoppingCart,
-  SfIconPerson,
   SfInput,
   SfIconSearch,
   SfIconMenu,
   SfIconArrowBack,
   SfLink,
+  SfIconLogin,
 } from "@storefront-ui/react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  UserButton,
+} from "@clerk/clerk-react";
 
 export default function NavBarTop() {
   const [inputValue, setInputValue] = useState("");
+  const navigate = useNavigate();
 
   const actionItems = [
     {
       icon: <SfIconShoppingCart />,
-      label: "",
+      label: "Cart",
+      link: "/checkout",
       ariaLabel: "Cart",
       role: "button",
-    },
-    {
-      label: "Log in",
-      icon: <SfIconPerson />,
-      ariaLabel: "Log in",
-      role: "login",
     },
   ];
 
@@ -86,7 +88,7 @@ export default function NavBarTop() {
         </SfButton>
         <form
           role="search"
-          className="hidden md:flex flex-[100%] order-last lg:order-3 mt-2 lg:mt-0 pb-2 lg:pb-0"
+          className="hidden md:flex w-[23] lg:w-[63%] order-last lg:order-3 mt-2 lg:mt-0 pb-2 lg:pb-0"
           onSubmit={search}
         >
           <SfInput
@@ -122,6 +124,11 @@ export default function NavBarTop() {
                 variant="tertiary"
                 square
                 slotPrefix={actionItem.icon}
+                onClick={() => {
+                  if (actionItem.link === "/checkout") {
+                    navigate(actionItem.link);
+                  }
+                }}
               >
                 {actionItem.role === "login" && (
                   <p className="hidden xl:inline-flex whitespace-nowrap">
@@ -130,6 +137,24 @@ export default function NavBarTop() {
                 )}
               </SfButton>
             ))}
+            <SignedOut>
+              <div>
+                <SignInButton>
+                  <SfButton
+                    size="sm"
+                    variant="tertiary"
+                    className="rounded-md text-white hover:text-white active:text-white hover:bg-primary-800 active:bg-primary-900"
+                    slotPrefix={<SfIconLogin />}
+                  >
+                    Sign In
+                  </SfButton>
+                </SignInButton>
+              </div>
+            </SignedOut>
+
+            <SignedIn>
+              <UserButton />
+            </SignedIn>
           </div>
         </nav>
       </div>

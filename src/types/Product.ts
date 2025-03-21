@@ -1,27 +1,18 @@
 import { ENUMS } from "../constants";
 
-export type Product =
-  | {
-      sync_product: {
-        id: number;
-        external_id: string;
-        name: string;
-        variants: number;
-        synced: number;
-        thumbnail_url: string;
-        is_ignored: boolean;
-      };
-      sync_variants?: SyncVariant[];
-    }
-  | {
-      id: number;
-      external_id: string;
-      name: string;
-      variants: number;
-      synced: number;
-      thumbnail_url: string;
-      is_ignored: boolean;
-    };
+export interface Product {
+  id?: number;
+  sync_product: {
+    id: number;
+    external_id: string;
+    name: string;
+    variants: number;
+    synced: number;
+    thumbnail_url: string;
+    is_ignored: boolean;
+  };
+  sync_variants?: SyncVariant[];
+}
 
 interface SyncVariant {
   id: number;

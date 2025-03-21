@@ -20,18 +20,8 @@ export default function ProductPage() {
 
   const images = [
     {
-      imageSrc:
-        (product &&
-          ("sync_product" in product
-            ? product.sync_product?.thumbnail_url ?? ""
-            : product.thumbnail_url ?? "")) ||
-        "",
-      alt:
-        (product &&
-          ("sync_product" in product
-            ? product.sync_product?.name ?? ""
-            : product.name ?? "")) ||
-        "",
+      imageSrc: product?.sync_product?.thumbnail_url ?? "",
+      alt: product?.sync_product?.name ?? "",
     },
   ];
 

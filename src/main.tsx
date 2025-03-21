@@ -5,15 +5,25 @@ import "./index.css";
 import AppRouter from "./router";
 import { CartProvider } from "./context/CartProvider";
 import { WishlistProvider } from "./context/WishlistProvider";
+import { ClerkProvider } from "@clerk/clerk-react";
+
+// Import your Publishable Key
+const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+
+if (!PUBLISHABLE_KEY) {
+  throw new Error("Missing Publishable Key");
+}
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <Router>
-      <CartProvider>
-        <WishlistProvider>
-          <AppRouter />
-        </WishlistProvider>
-      </CartProvider>
-    </Router>
+    <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/">
+      <Router>
+        <CartProvider>
+          <WishlistProvider>
+            <AppRouter />
+          </WishlistProvider>
+        </CartProvider>
+      </Router>
+    </ClerkProvider>
   </StrictMode>
 );

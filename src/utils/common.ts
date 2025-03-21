@@ -70,8 +70,17 @@ export const formatTitle = (title: string) => {
 };
 
 // Helper function to get a product's unique identifier
-export const getProductId = (product: Product) =>
-  "sync_product" in product ? product.sync_product.id : product.id;
+// export const getProductId = (product: Product) =>
+//   "sync_product" in product ? product.sync_product.id : product.id;
+
+// Helper function to get a product's price safely as a number
+export const getProductPrice = (product: Product): number => {
+  if (product.sync_variants?.length) {
+    const price = product.sync_variants[0].retail_price;
+    return typeof price === "string" ? parseFloat(price) || 0 : price || 0;
+  }
+  return 0;
+};
 
 export const buildCategoryTree = (
   categories: Category[],
@@ -94,7 +103,7 @@ export const handleWishlistToggle = (
 ) => {
   if (!product) return;
 
-  const idToString = getProductId(product).toString();
+  const idToString = product.sync_product.id.toString();
 
   if (isInWishlist) {
     removeFromWishlist(idToString);
@@ -103,4 +112,20 @@ export const handleWishlistToggle = (
   }
 
   setIsInWishlist(!isInWishlist);
+};
+
+export const handleAddToCart = (
+  product: Product | undefined,
+  value: number,
+  addToCart: ({
+    product,
+    quantity,
+  }: {
+    product: Product;
+    quantity: number;
+  }) => void
+) => {
+  if (product) {
+    addToCart({ product, quantity: value });
+  }
 };

@@ -11,42 +11,44 @@ import {
 import { Product } from "../../types/Product";
 import {
   generateShortDescription,
-  getProductId,
   handleWishlistToggle,
 } from "../../utils/common";
 import PLACEHOLDER_IMAGE from "../../assets/no-image.jpg";
 import { useWishlist } from "../../hooks/useWishlist";
 import { useEffect, useState } from "react";
+import { useCart } from "../../hooks/useCart";
 
 export default function ProductCardVertical({ product }: { product: Product }) {
+  const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, wishlist } = useWishlist();
   const [isInWishlist, setIsInWishlist] = useState(false);
 
   useEffect(() => {
-      if (product) {
-        setIsInWishlist(
-          wishlist.some((item) => getProductId(item) === getProductId(product))
-        );
-      }
-    }, [wishlist, product]);
+    if (product) {
+      setIsInWishlist(
+        wishlist.some(
+          (item) => item.sync_product.id === product.sync_product.id
+        )
+      );
+    }
+  }, [wishlist, product]);
 
-  const productImage =
-    "sync_product" in product
-      ? product.sync_product.thumbnail_url
-      : product.thumbnail_url;
+  const handleAddToCart = () => {
+    if (product) {
+      addToCart({ product, quantity: 1 });
+    }
+  };
 
-  const productName =
-    "sync_product" in product ? product.sync_product.name : product.name;
+  const productImage = product.sync_product.thumbnail_url;
+  const price = product.sync_variants?.length
+    ? product.sync_variants[0].retail_price
+    : 0;
+  const productName = product.sync_product.name;
 
   return (
     <div className="border border-neutral-200 rounded-md hover:shadow-lg max-w-[300px] flex flex-col">
       <div className="relative">
-        <Link
-          to={`/product/${
-            "sync_product" in product ? product.sync_product.id : product.id
-          }`}
-          className="block"
-        >
+        <Link to={`/product/${product.sync_product.id}`} className="block">
           <img
             src={productImage || PLACEHOLDER_IMAGE}
             alt={`${productName} image`}
@@ -87,9 +89,7 @@ export default function ProductCardVertical({ product }: { product: Product }) {
       {/* Content Wrapper */}
       <div className="p-4 border-t border-neutral-200 flex flex-col flex-grow">
         <Link
-          to={`/product/${
-            "sync_product" in product ? product.sync_product.id : product.id
-          }`}
+          to={`/product/${product.sync_product.id}`}
           className="no-underline"
         >
           <SfLink variant="secondary">{productName}</SfLink>
@@ -111,9 +111,13 @@ export default function ProductCardVertical({ product }: { product: Product }) {
         <SfButton
           size="sm"
           slotPrefix={<SfIconShoppingCart size="sm" />}
-          className="mt-auto"
+          className="mt-auto flex items-center gap-2"
+          onClick={handleAddToCart}
         >
-          Add to cart
+          <span className="block font-bold typography-text-lg">
+            ${price}
+          </span>
+          <span>Add to cart</span>
         </SfButton>
       </div>
     </div>

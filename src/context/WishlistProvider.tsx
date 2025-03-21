@@ -1,7 +1,6 @@
 import { useState, ReactNode } from "react";
 import { WishlistContext } from "./WishlistContext";
 import { Product } from "../types/Product";
-import { getProductId } from "../utils/common";
 import { WishlistContextType } from "../types/Wishlist";
 
 export const WishlistProvider = ({ children }: { children: ReactNode }) => {
@@ -9,7 +8,7 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
 
   const addToWishlist = (product: Product) => {
     setWishlist((prev) =>
-      prev.some((p) => getProductId(p) === getProductId(product))
+      prev.some((p) => p.sync_product.id === product.sync_product.id)
         ? prev
         : [...prev, product]
     );
@@ -17,7 +16,7 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
 
   const removeFromWishlist = (productId: string) => {
     setWishlist((prev) =>
-      prev.filter((p) => getProductId(p) !== Number(productId))
+      prev.filter((p) => p.sync_product.id !== Number(productId))
     );
   };
 
